@@ -1,0 +1,65 @@
+# { "Depends": "py-genlayer:test" }
+import json
+from genlayer import *
+
+class WarrantyArbiter(gl.Contract):
+    def __init__(self):
+        # We store successful arbitrations to build a 'reputation' log
+        self.verifications = TreeMap[Address, str]()
+
+    @gl.public.write
+    def request_arbitration(self, product_page_url: str, user_complaint: str):
+        """
+        Fetches official product data and uses AI to judge a user's complaint.
+        """
+        
+        # This nested function is a 'Non-Deterministic Block'. 
+        # It's the only place where Web and AI calls are allowed.
+        def perform_judgment():
+            # 1. Fetch the official product page
+            # Mode='text' strips HTML tags for easier AI processing
+            web_content = gl.get_webpage(product_page_url, mode='text')
+            
+            # 2. Build a high-context prompt
+            prompt = f"""
+            You are an expert consumer rights judge.
+            OFFICIAL PRODUCT DESCRIPTION:
+            {web_content[:2000]}  # Limit text to avoid token overflow
+            
+            USER COMPLAINT:
+            {user_complaint}
+            
+            TASK: 
+            Analyze if the user's complaint describes a failure of a promised feature 
+            found in the official description. 
+            
+            Return ONLY a JSON object:
+            {{
+                "is_valid_claim": bool,
+                "reasoning": "string",
+                "refund_percentage": int
+            }}
+            """
+            
+            # 3. Call the LLM
+            raw_response = gl.exec_prompt(prompt)
+            
+            # 4. Clean and parse the AI response
+            # Sometimes LLMs include markdown backticks; we strip them.
+            json_str = raw_response.replace("```json", "").replace("```", "").strip()
+            return json.loads(json_str)
+
+        # 5. The Equivalence Principle:
+        # Multiple validators run 'perform_judgment'. If they agree on the 
+        # result (even if the wording is slightly different), consensus is reached.
+        result = gl.eq_principle_strict_eq(perform_judgment)
+
+        if result["is_valid_claim"]:
+            self.verifications[gl.message.sender] = f"Approved: {result['reasoning']}"
+            return f"Claim Approved! Refund: {result['refund_percentage']}%"
+        else:
+            return f"Claim Rejected: {result['reasoning']}"
+
+    @gl.public.view
+    def check_status(self, user: Address) -> str:
+        return self.verifications.get(user, "No active claims found.")
