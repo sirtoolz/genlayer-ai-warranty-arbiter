@@ -1,3 +1,30 @@
+import { createClient, createAccount } from 'genlayer-js';
+import { testnetAsimov } from 'genlayer-js/chains';
+
+// Inside your App component:
+const runArbitration = async () => {
+  setLoading(true);
+  try {
+    // 1. Initialize the client the NEW way
+    const client = createClient({
+      chain: testnetAsimov,
+    });
+
+    // 2. Execute the write contract call
+    // Note: 'functionName' replaces 'method' in the new SDK
+    const txHash = await client.writeContract({
+      address: CONTRACT_ADDRESS,
+      functionName: 'request_arbitration',
+      args: [url, complaint],
+    });
+
+    setResult(`Transaction Sent! Hash: ${txHash}`);
+  } catch (error) {
+    console.error(error);
+    setResult("Error: Check console for SDK details.");
+  }
+  setLoading(false);
+};
 import * as genlayer from 'genlayer-js';
 
 // Then, inside your runArbitration function, use it like this:
