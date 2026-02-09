@@ -3,7 +3,7 @@ import { createClient } from 'genlayer-js';
 import { testnetAsimov } from 'genlayer-js/chains';
 
 // Replace with the address you got from studio.genlayer.com
-const CONTRACT_ADDRESS = "YOUR_DEPLOYED_CONTRACT_ADDRESS";
+const CONTRACT_ADDRESS = "0xd32209cE097Ed2C91050dc7c720963165A97C7fc";
 
 function App() {
   const [url, setUrl] = useState('');
