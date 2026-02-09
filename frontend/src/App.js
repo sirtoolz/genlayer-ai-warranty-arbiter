@@ -1,36 +1,8 @@
-import { createClient, createAccount } from 'genlayer-js';
+import React, { useState } from 'react';
+import { createClient } from 'genlayer-js';
 import { testnetAsimov } from 'genlayer-js/chains';
 
-// Inside your App component:
-const runArbitration = async () => {
-  setLoading(true);
-  try {
-    // 1. Initialize the client the NEW way
-    const client = createClient({
-      chain: testnetAsimov,
-    });
-
-    // 2. Execute the write contract call
-    // Note: 'functionName' replaces 'method' in the new SDK
-    const txHash = await client.writeContract({
-      address: CONTRACT_ADDRESS,
-      functionName: 'request_arbitration',
-      args: [url, complaint],
-    });
-
-    setResult(`Transaction Sent! Hash: ${txHash}`);
-  } catch (error) {
-    console.error(error);
-    setResult("Error: Check console for SDK details.");
-  }
-  setLoading(false);
-};
-import * as genlayer from 'genlayer-js';
-
-// Then, inside your runArbitration function, use it like this:
-const client = new genlayer.GenLayerClient('https://rpc.genlayer.com');
-import React, { useState } from 'react';
-
+// Replace with the address you got from studio.genlayer.com
 const CONTRACT_ADDRESS = "YOUR_DEPLOYED_CONTRACT_ADDRESS";
 
 function App() {
@@ -41,55 +13,77 @@ function App() {
 
   const runArbitration = async () => {
     setLoading(true);
+    setResult(null);
     try {
-      // Connect to GenLayer Testnet/Studio
-      const client = new GenLayerClient('https://rpc.genlayer.com'); 
-      
-      // Execute the 'request_arbitration' method from your Python contract
-      const tx = await client.writeContract({
-        address: CONTRACT_ADDRESS,
-        method: 'request_arbitration',
-        args: [url, complaint]
+      // 1. Initialize the client using the latest factory pattern
+      const client = createClient({
+        chain: testnetAsimov,
       });
 
-      setResult(tx.output);
+      // 2. Execute the Intelligent Contract call
+      // functionName matches the name of your @gl.public.write method in Python
+      const txHash = await client.writeContract({
+        address: CONTRACT_ADDRESS,
+        functionName: 'request_arbitration',
+        args: [url, complaint],
+      });
+
+      setResult(`Success! Transaction Hash: ${txHash}`);
     } catch (error) {
-      console.error(error);
-      setResult("Error: Could not reach consensus.");
+      console.error("GenLayer Error:", error);
+      setResult("Error: AI Consensus failed or contract not found. Check Console.");
     }
     setLoading(false);
   };
 
   return (
-    <div style={{ padding: '40px', fontFamily: 'sans-serif', maxWidth: '600px', margin: 'auto' }}>
-      <h1>⚖️ AI Warranty Arbiter</h1>
-      <p>Enter a product URL and your complaint. Our AI validators will decide your refund.</p>
+    <div style={{ padding: '40px', fontFamily: 'Arial, sans-serif', maxWidth: '600px', margin: 'auto', textAlign: 'center' }}>
+      <h1 style={{ color: '#007bff' }}>⚖️ GenLayer AI Arbiter</h1>
+      <p>Decentralized Warranty Justice via Intelligent Contracts</p>
       
-      <input 
-        placeholder="Product URL (e.g. Amazon/Tech site)" 
-        style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-        onChange={(e) => setUrl(e.target.value)}
-      />
-      <textarea 
-        placeholder="What is wrong with the product?" 
-        style={{ width: '100%', height: '100px', padding: '10px' }}
-        onChange={(e) => setComplaint(e.target.value)}
-      />
+      <div style={{ marginBottom: '20px' }}>
+        <input 
+          placeholder="Paste Product URL here..." 
+          style={{ width: '100%', padding: '12px', borderRadius: '5px', border: '1px solid #ccc' }}
+          onChange={(e) => setUrl(e.target.value)}
+        />
+      </div>
+
+      <div style={{ marginBottom: '20px' }}>
+        <textarea 
+          placeholder="Explain your complaint in detail..." 
+          style={{ width: '100%', height: '100px', padding: '12px', borderRadius: '5px', border: '1px solid #ccc' }}
+          onChange={(e) => setComplaint(e.target.value)}
+        />
+      </div>
       
       <button 
         onClick={runArbitration} 
         disabled={loading}
-        style={{ marginTop: '20px', padding: '10px 20px', background: '#007bff', color: 'white', border: 'none', cursor: 'pointer' }}
+        style={{ 
+          padding: '12px 24px', 
+          background: loading ? '#ccc' : '#007bff', 
+          color: 'white', 
+          border: 'none', 
+          borderRadius: '5px', 
+          cursor: 'pointer',
+          fontSize: '16px',
+          fontWeight: 'bold'
+        }}
       >
-        {loading ? "AI Validators are debating..." : "Submit to On-Chain Jury"}
+        {loading ? "AI Validators are debating..." : "Get AI Verdict"}
       </button>
 
       {result && (
-        <div style={{ marginTop: '30px', padding: '20px', border: '1px solid #ddd', borderRadius: '8px' }}>
-          <h3>Jury Verdict:</h3>
-          <pre>{JSON.stringify(result, null, 2)}</pre>
+        <div style={{ marginTop: '30px', padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', borderLeft: '5px solid #007bff' }}>
+          <h3>Jury Output:</h3>
+          <p style={{ wordBreak: 'break-all' }}>{result}</p>
         </div>
       )}
+      
+      <footer style={{ marginTop: '50px', fontSize: '12px', color: '#666' }}>
+        Built on GenLayer Testnet Asimov • Intelligent Contracts v1.0
+      </footer>
     </div>
   );
 }
