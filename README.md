@@ -1,8 +1,6 @@
-# genlayer-ai-warranty-arbiter
-Genlayer
 # ⚖️ GenLayer AI Warranty Arbiter
 
-This project is built for the **GenLayer Testnet (Builders Path)**. It demonstrates an Intelligent Contract that uses AI and Web Access to settle disputes on-chain.
+I built this project for the **GenLayer Testnet (Builders Path)**. It demonstrates an Intelligent Contract that uses AI and Web Access to settle disputes on-chain.
 
 ## 🚀 Why GenLayer?
 Unlike Solidity contracts, this project requires:
@@ -19,5 +17,5 @@ Unlike Solidity contracts, this project requires:
 - `/src`: React frontend code connecting to the GenLayer RPC.
 
 ## 🔗 Links
-- **Deployed Site:** [Insert your Vercel link here]
+- **Deployed Site:** https://toolz-genlayer-warranty-arbiter.vercel.app/
 - **Contract Address:** 0xd32209cE097Ed2C91050dc7c720963165A97C7fc
