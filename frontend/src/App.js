@@ -1,5 +1,8 @@
+import * as genlayer from 'genlayer-js';
+
+// Then, inside your runArbitration function, use it like this:
+const client = new genlayer.GenLayerClient('https://rpc.genlayer.com');
 import React, { useState } from 'react';
-import { GenLayerClient } from 'genlayer-js'; // Ensure you install this via npm
 
 const CONTRACT_ADDRESS = "YOUR_DEPLOYED_CONTRACT_ADDRESS";
 
